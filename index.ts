@@ -30,10 +30,14 @@ async function run(): Promise<void> {
       return
     }
 
+    let npmArgs = core.getInput('npm-args').split(/\s+/).filter(Boolean)
+    if (npmArgs.length > 0) {
+      npmArgs = ['--', ...npmArgs]
+    }
     const workingDir = core.getInput('working-dir') || '.'
     const pkgManager = (await ioUtil.exists(`${workingDir}/yarn.lock`)) ? 'yarn' : 'npm'
     console.log(`Installing your site's dependencies using ${pkgManager}.`)
-    await exec.exec(`${pkgManager} install`, [], {cwd: workingDir})
+    await exec.exec(`${pkgManager} install`, npmArgs, {cwd: workingDir})
     console.log('Finished installing dependencies.')
 
     let gatsbyArgs = core.getInput('gatsby-args').split(/\s+/).filter(Boolean)
